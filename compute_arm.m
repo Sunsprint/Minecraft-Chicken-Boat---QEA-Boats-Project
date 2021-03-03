@@ -37,17 +37,17 @@ boatMass = sum(boatMasses);
 centerOfMass = sum(points .* boatMasses) / boatMass;
 
 % Center of Buoyancy
-waterMasses = 0;
-waterMass = 0;
-function massDiff = compute_diff(d)
+function waterMasses = water_masses(d)
     inChickenAndBelowWater = inChicken & (points(:,2) <= d);
     waterMasses = inChickenAndBelowWater * dV * rhoWater;
-    waterMass = sum(waterMasses);
-    massDiff = boatMass - waterMass;
+end
+function massDiff = compute_diff(d)
+    massDiff = boatMass - sum(water_masses(d));
 end
 d = fzero(@compute_diff, 0);
 compute_diff(d);
-centerOfBuoyancy = sum(points .* waterMasses) / waterMass;
+waterMasses = water_masses(d);
+centerOfBuoyancy = sum(points .* waterMasses) / sum(waterMasses);
 
 momentArm = [centerOfMass(1) - centerOfBuoyancy(1); centerOfMass(3) - centerOfBuoyancy(3)];
 
